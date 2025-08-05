@@ -1,0 +1,83 @@
+<div class="layout layout--col gap--space-between">
+
+    <!-- TEMPERATURE & HUMIDITY -->
+    <div class="grid grid--cols-3">
+        <span class="label col--span-3">Thermometers</span>
+        <div class="item">
+            <div class="meta"></div>
+            <div class="content">
+                <span class="value">{{ metrics.temperature.inside | round: 1 }}°</span>
+                <span class="value value--xsmall">{{ metrics.humidity.inside | round: 1 }}%</span>
+                <span class="label">Inside</span>
+            </div>
+        </div>
+        <div class="item">
+            <div class="meta"></div>
+            <div class="content">
+                <span class="value">{{ metrics.temperature.outside | round: 1 }}°</span>
+                <span class="value value--xsmall">{{ metrics.humidity.outside | round: 1 }}%</span>
+                <span class="label">Outside</span>
+            </div>
+        </div>
+        <div class="item">
+            <div class="meta"></div>
+            <div class="content">
+                <span class="value">{{ metrics.temperature.garage | round: 1 }}°</span>
+                <span class="value value--xsmall">{{ metrics.humidity.garage | round: 1 }}%</span>
+                <span class="label">Garage</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="border--h-5 w--full"></div>
+
+    <!-- LIGHTS -->
+    <div class="grid grid--cols-1">
+        <div class="item">
+            <div class="meta"></div>
+            <div class="content">
+                <span class="value value--small">{{ lights.on }} Lights</span>
+                <span class="label">out of {{ lights.on | plus: lights.off }} are on</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="border--h-5 w--full"></div>
+
+    <!-- OPEN SENSORS -->
+    <div class="grid grid--cols-1 ">
+        <div class="item">
+            <div class="meta"></div>
+            <div class="content">
+                <span class="label">Open entry sensors</span>
+                {% if open_sensors.size > 0 %}
+                <span class="value value--xsmall">{{ open_sensors | join: "<br>" }}</span>
+                {% else %}
+                <span class="value value--xsmall">None</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="border--h-5 w--full"></div>
+
+    <!-- MEDIA PLAYERS -->
+    <div class="item">
+        <div class="meta"></div>
+        <div class="content">
+            <span class="label">Speakers playing music</span>
+            {% if speakers_playing.size > 0 %}
+            <span class="value value--xsmall" style="white-space: nowrap;">{{ speakers_playing | join: "\n" }}</span>
+            {% else %}
+            <span class="value value--xsmall">None</span>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+
+<div class="title_bar">
+    <img class="image" src="https://www.svgrepo.com/show/330638/homeassistant.svg">
+    <span class="title">Nottingham HomeAssistant</span>
+    <span class="instance">{{ generated }}</span>
+</div>

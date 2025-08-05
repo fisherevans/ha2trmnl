@@ -1,8 +1,8 @@
-package pkg
+package util
 
 import "encoding/json"
 
-func toJson(v any) string {
+func ToJson(v any) string {
 	b, _ := json.MarshalIndent(v, "", "  ")
 	return string(b)
 }

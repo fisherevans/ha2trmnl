@@ -1,4 +1,4 @@
-package pkg
+package runner
 
 import (
 	"fmt"
@@ -6,9 +6,11 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"fisherevans.com/ha2trmnl/internal/homeassistant"
 )
 
-func parse(entities []Entity) map[string]interface{} {
+func parse(entities []homeassistant.Entity) map[string]interface{} {
 	return map[string]interface{}{
 		"lights":           parseLightsOn(entities),
 		"speakers_playing": parseSpeakersPlaying(entities),
@@ -18,7 +20,7 @@ func parse(entities []Entity) map[string]interface{} {
 	}
 }
 
-func parseLightsOn(entities []Entity) map[string]any {
+func parseLightsOn(entities []homeassistant.Entity) map[string]any {
 	var on, off int
 
 	for _, e := range entities {
@@ -47,7 +49,7 @@ func parseLightsOn(entities []Entity) map[string]any {
 	}
 }
 
-func parseSpeakersPlaying(entities []Entity) []string {
+func parseSpeakersPlaying(entities []homeassistant.Entity) []string {
 	var playing []string
 
 	for _, e := range entities {
@@ -59,7 +61,7 @@ func parseSpeakersPlaying(entities []Entity) []string {
 	return playing
 }
 
-func parseOpenEntries(entities []Entity) []string {
+func parseOpenEntries(entities []homeassistant.Entity) []string {
 	timeOpen := func(t string) string {
 		parsed, err := time.Parse(time.RFC3339Nano, t)
 		if err != nil {
@@ -88,7 +90,7 @@ func parseOpenEntries(entities []Entity) []string {
 	return open
 }
 
-func parseThermometers(entities []Entity) map[string]map[string]float64 {
+func parseThermometers(entities []homeassistant.Entity) map[string]map[string]float64 {
 	groups := map[string]map[string][]float64{
 		"temperature": {
 			"inside":  {},
@@ -102,7 +104,7 @@ func parseThermometers(entities []Entity) map[string]map[string]float64 {
 		},
 	}
 
-	matchGroup := func(e Entity) (string, string, bool) {
+	matchGroup := func(e homeassistant.Entity) (string, string, bool) {
 		for _, l := range e.Labels {
 			subGroups, groupOk := groups[l]
 			if !groupOk {

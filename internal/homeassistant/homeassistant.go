@@ -1,11 +1,14 @@
-package pkg
+package homeassistant
 
 import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 
+	"fisherevans.com/ha2trmnl/internal/config"
+	"fisherevans.com/ha2trmnl/internal/util"
 	"github.com/gorilla/websocket"
 )
 
@@ -96,12 +99,12 @@ func fetchEntityLabelsWS(host, token string) (map[string][]string, error) {
 	return labelMap, nil
 }
 
-func (i Instance) loadHomeAssistantEntities() ([]Entity, error) {
-	entities, err := fetchStates(i.HomeAssistantHost, i.HomeAssistantToken)
+func LoadHomeAssistantEntities(c config.Config) ([]Entity, error) {
+	entities, err := fetchStates(c.HomeAssistantHost, c.HomeAssistantToken)
 	if err != nil {
 		return nil, fmt.Errorf("HA entity fetch: %w", err)
 	}
-	labelMap, err := fetchEntityLabelsWS(i.HomeAssistantHost, i.HomeAssistantToken)
+	labelMap, err := fetchEntityLabelsWS(c.HomeAssistantHost, c.HomeAssistantToken)
 	if err != nil {
 		return nil, fmt.Errorf("HA label fetch: %w", err)
 	}
@@ -110,8 +113,8 @@ func (i Instance) loadHomeAssistantEntities() ([]Entity, error) {
 			entities[i].Labels = labels
 		}
 	}
-	if i.Debug {
-		fmt.Println("HA Dataset:\n" + toJson(entities))
+	if c.Debug {
+		log.Println("HA Dataset:\n" + util.ToJson(entities))
 	}
 	return entities, nil
 }

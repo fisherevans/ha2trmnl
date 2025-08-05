@@ -1,14 +1,17 @@
-package pkg
+package trmnl
 
 import (
 	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
+
+	"fisherevans.com/ha2trmnl/internal/config"
 )
 
-func (i Instance) sendWebhook(data map[string]interface{}) error {
+func SendData(c config.Config, data map[string]interface{}) error {
 	payload := map[string]interface{}{
 		"merge_variables": data,
 	}
@@ -16,12 +19,12 @@ func (i Instance) sendWebhook(data map[string]interface{}) error {
 	if err != nil {
 		return fmt.Errorf("failed to marshal payload: %w", err)
 	}
-	fmt.Println(string(body))
-	if i.DryRun {
-		fmt.Println("<<<<< DATA NOT SENT TO WEBHOOK DUE TO DRY RUN MODE >>>>>")
+	log.Println("Payload sent to TRMNL:\n" + string(body))
+	if c.DryRun {
+		log.Println("!!! DATA NOT SENT TO WEBHOOK DUE TO DRY RUN MODE !!!")
 		return nil
 	}
-	req, _ := http.NewRequest("POST", i.TrmnlWebhook, bytes.NewReader(body))
+	req, _ := http.NewRequest("POST", c.TrmnlWebhook, bytes.NewReader(body))
 	req.Header.Set("Content-Type", "application/json")
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {

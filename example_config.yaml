@@ -1,5 +1,0 @@
-# copy this to config.yaml and update it with your values
-home_assistant_host: homeassistant.local:8123
-home_assistant_token: REPLACE_ME
-trmnl_webhook: https://usetrmnl.com/api/custom_plugins/REPLACE_ME
-dry_run: true

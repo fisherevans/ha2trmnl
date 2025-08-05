@@ -1,4 +1,4 @@
-package pkg
+package homeassistant
 
 type Entity struct {
 	EntityID    string                 `json:"entity_id"`
