@@ -69,7 +69,8 @@ services:
     image: fisherevans/ha2trmnl:latest
     restart: unless-stopped
     environment:
-      CRON_SCHEDULE: "*/15 * * * *"
+      CRON_SCHEDULE: "*/5 * * * *"
+      TZ: "America/New_York"
     volumes:
       - /path/to/your/ha2trmnl_config.yaml:/config/config.yaml:ro
 ```

@@ -16,7 +16,6 @@ func parse(entities []homeassistant.Entity) map[string]interface{} {
 		"speakers_playing": parseSpeakersPlaying(entities),
 		"open_sensors":     parseOpenEntries(entities),
 		"metrics":          parseThermometers(entities),
-		"generated":        time.Now().In(time.Local).Format("15h04m"),
 	}
 }
 

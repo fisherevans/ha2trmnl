@@ -13,6 +13,7 @@ type Config struct {
 	HomeAssistantToken string `yaml:"home_assistant_token"`
 	TrmnlWebhook       string `yaml:"trmnl_webhook"`
 	DryRun             bool   `yaml:"dry_run"`
+	TimeZone           string `yaml:"time_zone"`
 	Debug              bool   `yaml:"debug"`
 }
 
