@@ -2,23 +2,37 @@ package config
 
 import (
 	"fmt"
-	"log"
 	"os"
 
 	"gopkg.in/yaml.v3"
 )
 
 type Config struct {
-	HomeAssistantHost  string `yaml:"home_assistant_host"`
-	HomeAssistantToken string `yaml:"home_assistant_token"`
-	TrmnlWebhook       string `yaml:"trmnl_webhook"`
-	DryRun             bool   `yaml:"dry_run"`
-	TimeZone           string `yaml:"time_zone"`
-	Debug              bool   `yaml:"debug"`
+	HomeAssistantConfig `yaml:"home_assistant"`
+	ServeConfig         `yaml:"serve"`
+	PushConfig          `yaml:"push"`
+
+	TimeZone string `yaml:"time_zone"`
+	Debug    bool   `yaml:"debug"`
+}
+
+type HomeAssistantConfig struct {
+	HomeAssistantHost  string `yaml:"host"`
+	HomeAssistantToken string `yaml:"token"`
+}
+
+type ServeConfig struct {
+	ApiToken string `yaml:"api_token"`
+	Address  string `yaml:"address"`
+}
+
+type PushConfig struct {
+	Interval string `yaml:"interval"`
+	Webhook  string `yaml:"webhook"`
+	DryRun   bool   `yaml:"dry_run"`
 }
 
 func FromFile(path string) (Config, error) {
-	log.Println("Config file: " + path)
 	var c Config
 
 	configContents, err := os.ReadFile(path)

@@ -5,11 +5,28 @@ This tool is the backend of a Private TRMNL plugin. It is very simple:
 - Call the HomeAssistant entity API to get all entities
 - Call the HomeAssistant websocket API to get all labels assigned in the UI
 - Compute some metrics/aggregates based on entity states
-- Send a simple JSON payloads to a TRMNL webhook for a Private Plugin
+
+Depending on the run mode, this aggregate is handled differently:
+
+- `push` will run on a configurable interval, and send the data to a TRMNL webhook
+- `serve` will expose a `/plugin_data` HTTP endpoint that exposes the data
+- `fetch` will just log the data to STDOUT
+
+You can run the tool via:
+
+```bash
+go run ./cmd/ha2trmnl [serve|push|fetch] (./path/to/config.yaml)
+```
 
 I added a `Dockerfile` that wraps this script to run it in a container as a CronJob.
 
-This is an example payload of what it sends to TRMNL:
+Using this [markup.html](examples/markup.html), we get this nice plugin:
+
+![screenshot](examples/plugin.png)
+
+***This script is very customized to my needs and my HA setup. I expect the best use case for this repo will be an example and inspiration for others to build their own private plugins.***
+
+This is an example of the data the tool will generate and give to TRMNL:
 
 ```json
 {
@@ -43,18 +60,23 @@ This is an example payload of what it sends to TRMNL:
 }
 ```
 
-Using this [markup.html](examples/markup.html), we get this nice plugin:
-
-![screenshot](examples/plugin.png)
-
-***This script is very customized to my needs and my HA setup. I expect the best use case for this repo will be an example and inspiration for others to build their own private plugins.***
-
 ## Setup
 
 First, make a new [Private Plugin](https://docs.usetrmnl.com/go/private-plugins/templates):
 
-- Use the Webhook strategy
-- Copy the webhook URL (you need it for the config later)
+- Use either the Webhook or Polling strategy
+  - For the Webhook option, copy the webhook URL (you need it for the config later)
+  - For the Polling option, configure the following:
+    - URL: `https://yoursite.com/plugin_data`
+    - Headers: `authorization=bearer {{ api_key }}&content-type=application/json`
+    - Form fields (to be able to set the `api_key`):
+      ```yaml
+      - keyname: api_key
+        field_type: password
+        name: API Key
+        description: Bearer token passed to poller
+        placeholder: s3cret!
+      ```
 - Edit the markup for the plugin. Here's an example: [markup.html](examples/markup.html)
 
 Next, create config file, like what's in [example_config.yaml](examples/example_config.yaml)
@@ -68,16 +90,16 @@ services:
   ha2trmnl:
     image: fisherevans/ha2trmnl:latest
     restart: unless-stopped
-    environment:
-      CRON_SCHEDULE: "*/5 * * * *"
-      TZ: "America/New_York"
+    command: ["serve", "/config/config.yaml"]
+    ports:
+      - "9123:9123" # this needs to match what's in your config
     volumes:
       - /path/to/your/ha2trmnl_config.yaml:/config/config.yaml:ro
 ```
 
 ## Developing
 
-- `go run ./cmd/ha2trmnl` to run the tool locally based on the source code
+- `go run ./cmd/ha2trmnl serve` to run the tool locally based on the source code
 - `./build.sh` will build a new docker image locally
-- `./run_docker.sh` will run the local docker image with a once-per-minute CRON schedule
+- `./run_docker.sh push /config/config.yaml` will run the local docker image (useful for testing)
 - `./publish.sh` will publish the docker image (only I can, haha)

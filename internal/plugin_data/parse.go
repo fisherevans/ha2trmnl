@@ -1,4 +1,4 @@
-package runner
+package plugin_data
 
 import (
 	"fmt"
@@ -10,7 +10,7 @@ import (
 	"fisherevans.com/ha2trmnl/internal/homeassistant"
 )
 
-func parse(entities []homeassistant.Entity) map[string]interface{} {
+func parse(entities []homeassistant.Entity) map[string]any {
 	return map[string]interface{}{
 		"lights":           parseLightsOn(entities),
 		"speakers_playing": parseSpeakersPlaying(entities),

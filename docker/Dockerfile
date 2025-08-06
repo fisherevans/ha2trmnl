@@ -4,18 +4,25 @@ FROM golang:1.23.1-alpine AS builder
 RUN apk add --no-cache git
 WORKDIR /src
 COPY . .
+
 RUN CGO_ENABLED=0 go build -o ha2trmnl ./cmd/ha2trmnl
 
 # --- Stage 2: runtime container ---
 FROM alpine:3.19
 
-RUN apk add --no-cache bash curl ca-certificates busybox-suid shadow \
+# Install runtime deps
+RUN apk add --no-cache bash curl ca-certificates busybox-suid shadow tzdata \
   && useradd -u 1000 ha2trmnl || true
 
+# Copy binary from builder
 COPY --from=builder /src/ha2trmnl /usr/local/bin/ha2trmnl
-COPY docker/entrypoint.sh /entrypoint.sh
 
-RUN chmod +x /usr/local/bin/ha2trmnl /entrypoint.sh
+# Ensure it's executable
+RUN chmod +x /usr/local/bin/ha2trmnl
 
-ENV CRON_SCHEDULE="*/5 * * * *"
-CMD ["/entrypoint.sh"]
+# Use non-root by default
+USER ha2trmnl
+
+# Set default mode (can override via `docker run ... push`)
+ENTRYPOINT ["/usr/local/bin/ha2trmnl"]
+CMD ["serve", "/config/config.yaml"]

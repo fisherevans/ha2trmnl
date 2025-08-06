@@ -4,12 +4,44 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 
 	"fisherevans.com/ha2trmnl/internal/config"
 	"github.com/gorilla/websocket"
 )
+
+type Instance struct {
+	config config.HomeAssistantConfig
+}
+
+func New(config config.HomeAssistantConfig) *Instance {
+	if config.HomeAssistantHost == "" {
+		panic("missing ha host")
+	}
+	if config.HomeAssistantToken == "" {
+		panic("missing ha token")
+	}
+	return &Instance{
+		config: config,
+	}
+}
+
+func (i *Instance) LoadHomeAssistantEntities() ([]Entity, error) {
+	entities, err := fetchStates(i.config.HomeAssistantHost, i.config.HomeAssistantToken)
+	if err != nil {
+		return nil, fmt.Errorf("HA entity fetch: %w", err)
+	}
+	labelMap, err := fetchEntityLabelsWS(i.config.HomeAssistantHost, i.config.HomeAssistantToken)
+	if err != nil {
+		return nil, fmt.Errorf("HA label fetch: %w", err)
+	}
+	for i := range entities {
+		if labels, ok := labelMap[entities[i].EntityID]; ok {
+			entities[i].Labels = labels
+		}
+	}
+	return entities, nil
+}
 
 func fetchStates(host, token string) ([]Entity, error) {
 	url := fmt.Sprintf("http://%s/api/states", host)
@@ -96,25 +128,4 @@ func fetchEntityLabelsWS(host, token string) (map[string][]string, error) {
 		}
 	}
 	return labelMap, nil
-}
-
-func LoadHomeAssistantEntities(c config.Config) ([]Entity, error) {
-	entities, err := fetchStates(c.HomeAssistantHost, c.HomeAssistantToken)
-	if err != nil {
-		return nil, fmt.Errorf("HA entity fetch: %w", err)
-	}
-	labelMap, err := fetchEntityLabelsWS(c.HomeAssistantHost, c.HomeAssistantToken)
-	if err != nil {
-		return nil, fmt.Errorf("HA label fetch: %w", err)
-	}
-	for i := range entities {
-		if labels, ok := labelMap[entities[i].EntityID]; ok {
-			entities[i].Labels = labels
-		}
-	}
-	if c.Debug {
-		j, _ := json.Marshal(entities)
-		log.Println("HA Dataset:\n" + string(j))
-	}
-	return entities, nil
 }
