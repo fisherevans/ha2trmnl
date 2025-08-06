@@ -6,6 +6,8 @@ import (
 
 	"fisherevans.com/ha2trmnl/internal/config"
 	"fisherevans.com/ha2trmnl/internal/runner"
+
+	_ "time/tzdata" // used to ensure timezone data is available if it's missing in the OS environment
 )
 
 func init() {
