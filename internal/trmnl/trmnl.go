@@ -15,7 +15,7 @@ func SendData(c config.Config, data map[string]interface{}) error {
 	payload := map[string]interface{}{
 		"merge_variables": data,
 	}
-	body, err := json.MarshalIndent(payload, "", "  ")
+	body, err := json.Marshal(payload)
 	if err != nil {
 		return fmt.Errorf("failed to marshal payload: %w", err)
 	}

@@ -8,7 +8,6 @@ import (
 	"net/http"
 
 	"fisherevans.com/ha2trmnl/internal/config"
-	"fisherevans.com/ha2trmnl/internal/util"
 	"github.com/gorilla/websocket"
 )
 
@@ -114,7 +113,8 @@ func LoadHomeAssistantEntities(c config.Config) ([]Entity, error) {
 		}
 	}
 	if c.Debug {
-		log.Println("HA Dataset:\n" + util.ToJson(entities))
+		j, _ := json.Marshal(entities)
+		log.Println("HA Dataset:\n" + string(j))
 	}
 	return entities, nil
 }

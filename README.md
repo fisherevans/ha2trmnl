@@ -5,7 +5,7 @@ This tool is the backend of a Private TRMNL plugin. It is very simple:
 - Call the HomeAssistant entity API to get all entities
 - Call the HomeAssistant websocket API to get all labels assigned in the UI
 - Compute some metrics/aggregates based on entity states
-- Send a simple JSON payloads to a TRMNL webhook
+- Send a simple JSON payloads to a TRMNL webhook for a Private Plugin
 
 I added a `Dockerfile` that wraps this script to run it in a container as a CronJob.
 
@@ -42,6 +42,10 @@ This is an example payload of what it sends to TRMNL:
   }
 }
 ```
+
+Using this [markup.html](examples/markup.html), we get this nice plugin:
+
+![screenshot](examples/plugin.png)
 
 ***This script is very customized to my needs and my HA setup. I expect the best use case for this repo will be an example and inspiration for others to build their own private plugins.***
 

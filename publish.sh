@@ -7,7 +7,7 @@ REPO="fisherevans/ha2trmnl"
 if [[ $# -gt 0 ]]; then
   NEW_TAG="$1"
 else
-  LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.1.0")
+  LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.1")
   IFS='.' read -r MAJOR MINOR PATCH <<<"${LAST_TAG#v}"
   NEW_TAG="v${MAJOR}.${MINOR}.$((PATCH + 1))"
 fi
